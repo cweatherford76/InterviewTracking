@@ -109,7 +109,7 @@ An **Interview** belongs to a Job. Fields:
 - Overall impression (1–5, optional)
 
 **Sub-records:**
-- **Interview Participants** — interviewers; either an existing Contact or a free-text name + role
+- **Interview Participants** — interviewers. Either link to an existing Contact (auto-fills the fields) or enter free-form. Fields: `name`, `title`, `email`, `phone` (all optional), plus `role` (e.g. "Hiring Manager", "Engineer").
 - **Interview Questions** — ordered list of `(question, my_answer, notes, was_difficult)`; added/removed inline via HTMX
 
 ### 4.5 Conversations
@@ -162,7 +162,7 @@ Nine tables. Indexes on hot lookup columns.
 | `job_tag` | `job_id, tag_id` (PK composite) |
 | `conversation` | `id, job_id, contact_id?, occurred_at, channel, subject, notes, follow_up_date?` |
 | `interview` | `id, job_id, scheduled_at, duration_minutes, round_name, format, location_or_link, status, preparation_notes, outcome_notes, overall_impression?` |
-| `interview_participant` | `id, interview_id, contact_id?, name_text?, role` |
+| `interview_participant` | `id, interview_id, contact_id?, name?, title?, email?, phone?, role?` |
 | `interview_question` | `id, interview_id, position, question, my_answer, notes, was_difficult` |
 
 **Indexes:** `job(status)`, `job(company_id)`, `interview(scheduled_at)`, `conversation(follow_up_date)`, `job(application_deadline)`.
