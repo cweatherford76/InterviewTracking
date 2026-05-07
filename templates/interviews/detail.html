@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rating_stars %}
+{% block title %}Interview · {{ interview.job.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h3 class="mb-1">{{ interview.round_name or 'Interview' }}</h3>
+    <div class="text-muted">
+      <a href="{{ url_for('jobs.detail', job_id=interview.job.id) }}">{{ interview.job.title }}</a>
+      · {{ interview.job.company.name }}
+    </div>
+  </div>
+  <div>
+    <a href="{{ url_for('interviews.edit', interview_id=interview.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+    <form method="post" action="{{ url_for('interviews.delete', interview_id=interview.id) }}" class="d-inline"
+          onsubmit="return confirm('Delete this interview?');">
+      <button class="btn btn-sm btn-outline-danger">Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-7">
+    <div class="detail-section">
+      <h5>Details</h5>
+      <div class="row g-2">
+        <div class="col-md-6"><strong>When:</strong> {{ interview.scheduled_at|fmt_datetime }} ({{ interview.duration_minutes }} min)</div>
+        <div class="col-md-3"><strong>Format:</strong> {{ interview.format|capitalize }}</div>
+        <div class="col-md-3"><strong>Status:</strong> {{ interview.status|capitalize }}</div>
+        <div class="col-md-12"><strong>Where:</strong>
+          {% if interview.location_or_link %}
+            {% if interview.location_or_link.startswith('http') %}
+              <a href="{{ interview.location_or_link }}" target="_blank" rel="noopener">{{ interview.location_or_link }}</a>
+            {% else %}
+              {{ interview.location_or_link }}
+            {% endif %}
+          {% else %}—{% endif %}
+        </div>
+        <div class="col-md-6"><strong>Impression:</strong> {{ rating_stars(interview.overall_impression) }}</div>
+      </div>
+    </div>
+
+    {% if interview.preparation_notes %}
+      <div class="detail-section">
+        <h5>Preparation notes</h5>
+        <div style="white-space: pre-wrap;">{{ interview.preparation_notes }}</div>
+      </div>
+    {% endif %}
+    {% if interview.outcome_notes %}
+      <div class="detail-section">
+        <h5>Outcome notes</h5>
+        <div style="white-space: pre-wrap;">{{ interview.outcome_notes }}</div>
+      </div>
+    {% endif %}
+
+    <div class="detail-section">
+      <h5>Questions ({{ interview.questions|length }})</h5>
+      <div id="question-list" class="mb-3 border rounded">
+        {% for q in interview.questions %}
+          {% include "interviews/_question_row.html" %}
+        {% else %}
+          <div class="text-muted small p-3" id="no-questions">No questions logged yet.</div>
+        {% endfor %}
+      </div>
+
+      <form hx-post="{{ url_for('interviews.add_question', interview_id=interview.id) }}"
+            hx-target="#question-list"
+            hx-swap="beforeend"
+            hx-on::after-request="if(event.detail.successful) { this.reset(); document.getElementById('no-questions')?.remove(); }">
+        <div class="row g-2">
+          <div class="col-12">
+            <textarea name="question" class="form-control" rows="2" placeholder="Question asked…" required></textarea>
+          </div>
+          <div class="col-md-6">
+            <textarea name="my_answer" class="form-control" rows="2" placeholder="Your answer (optional)"></textarea>
+          </div>
+          <div class="col-md-6">
+            <textarea name="notes" class="form-control" rows="2" placeholder="Notes (optional)"></textarea>
+          </div>
+          <div class="col-md-6 d-flex align-items-center">
+            <label class="form-check">
+              <input type="checkbox" class="form-check-input" name="was_difficult" value="1">
+              <span class="form-check-label">Difficult</span>
+            </label>
+          </div>
+          <div class="col-md-6 text-end">
+            <button class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add question</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="detail-section">
+      <h5>Participants</h5>
+      <table class="table table-sm align-middle">
+        <thead><tr><th>Name</th><th>Role</th><th>Title</th><th>Email</th><th>Phone</th><th></th></tr></thead>
+        <tbody id="participant-list">
+          {% for p in interview.participants %}
+            {% include "interviews/_participant_row.html" %}
+          {% else %}
+            <tr id="no-participants"><td colspan="6" class="text-muted text-center small">No participants added.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <form hx-post="{{ url_for('interviews.add_participant', interview_id=interview.id) }}"
+            hx-target="#participant-list"
+            hx-swap="beforeend"
+            hx-on::after-request="if(event.detail.successful) { this.reset(); document.getElementById('no-participants')?.remove(); }"
+            class="row g-2 mt-2">
+        <div class="col-md-12">
+          <select name="contact_id" class="form-select form-select-sm">
+            <option value="">— Or pick an existing contact —</option>
+            {% for c in contacts %}<option value="{{ c.id }}">{{ c.name }}{% if c.company %} ({{ c.company.name }}){% endif %}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6"><input class="form-control form-control-sm" name="name" placeholder="Name"></div>
+        <div class="col-md-6"><input class="form-control form-control-sm" name="role" placeholder="Role (e.g. Hiring Mgr)"></div>
+        <div class="col-md-6"><input class="form-control form-control-sm" name="title" placeholder="Title"></div>
+        <div class="col-md-6"><input class="form-control form-control-sm" name="email" placeholder="Email" type="email"></div>
+        <div class="col-md-6"><input class="form-control form-control-sm" name="phone" placeholder="Phone"></div>
+        <div class="col-md-6 text-end"><button class="btn btn-sm btn-primary">Add participant</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

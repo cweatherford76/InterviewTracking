@@ -1,0 +1,22 @@
+<tr id="p-{{ p.id }}">
+  <td class="fw-semibold">
+    {% if p.contact %}
+      <a href="{{ url_for('contacts.edit', contact_id=p.contact.id) }}" class="text-decoration-none">{{ p.display_name }}</a>
+    {% else %}
+      {{ p.display_name }}
+    {% endif %}
+  </td>
+  <td>{{ p.role or '' }}</td>
+  <td>{{ p.display_title or '' }}</td>
+  <td>{% if p.display_email %}<a href="mailto:{{ p.display_email }}">{{ p.display_email }}</a>{% endif %}</td>
+  <td>{{ p.display_phone or '' }}</td>
+  <td class="text-end">
+    <button class="btn btn-sm btn-outline-danger"
+            hx-post="{{ url_for('interviews.delete_participant', participant_id=p.id) }}"
+            hx-target="#p-{{ p.id }}"
+            hx-swap="outerHTML"
+            hx-confirm="Remove this participant?">
+      <i class="bi bi-trash"></i>
+    </button>
+  </td>
+</tr>

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, rating_stars, tag_pills %}
+{% block title %}{{ job.title }} · Interview Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h3 class="mb-1">{{ job.title }}</h3>
+    <div class="text-muted">
+      <a href="{{ url_for('companies.detail', company_id=job.company.id) }}">{{ job.company.name }}</a>
+      {% if job.location %} · {{ job.location }}{% endif %}
+      {% if job.remote_type %} · {{ job.remote_type|capitalize }}{% endif %}
+    </div>
+  </div>
+  <div>
+    {{ status_badge(job.status) }}
+    <a href="{{ url_for('jobs.edit', job_id=job.id) }}" class="btn btn-sm btn-outline-secondary ms-2">Edit</a>
+    <form method="post" action="{{ url_for('jobs.delete', job_id=job.id) }}" class="d-inline"
+          onsubmit="return confirm('Delete this job and all its interviews & conversations?');">
+      <button class="btn btn-sm btn-outline-danger">Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-7">
+    <div class="detail-section">
+      <h5>Overview</h5>
+      <div class="row g-2">
+        <div class="col-md-6"><strong>Rating:</strong> {{ rating_stars(job.rating) }}</div>
+        <div class="col-md-6">
+          <strong>Tags:</strong>
+          {% if job.tags %}{{ tag_pills(job.tags) }}{% else %}<span class="text-muted small">None</span>{% endif %}
+        </div>
+        <div class="col-md-6"><strong>Salary:</strong>
+          {% if job.salary_min or job.salary_max %}
+            {{ job.salary_min|money }}{% if job.salary_min and job.salary_max %} – {% endif %}{{ job.salary_max|money }}
+          {% else %}—{% endif %}
+          {% if job.salary_notes %}<div class="small text-muted">{{ job.salary_notes }}</div>{% endif %}
+        </div>
+        <div class="col-md-6"><strong>Source:</strong> {{ job.source or '—' }}</div>
+        <div class="col-md-6"><strong>Applied:</strong> {{ job.application_date|fmt_date or '—' }}{% if job.application_method %} · {{ job.application_method }}{% endif %}</div>
+        <div class="col-md-6"><strong>Deadline:</strong> {{ job.application_deadline|fmt_date or '—' }}</div>
+        <div class="col-md-12">
+          <strong>Job posting:</strong>
+          {% if job.job_post_url %}<a href="{{ job.job_post_url }}" target="_blank" rel="noopener">Open original posting <i class="bi bi-box-arrow-up-right"></i></a>{% else %}—{% endif %}
+        </div>
+        <div class="col-md-12">
+          <strong>Local folder:</strong>
+          {% if job.local_folder_path %}
+            <a href="file://{{ job.local_folder_path }}">{{ job.local_folder_path }}</a>
+            <div class="form-text">If the link doesn't open, your browser may block <code>file://</code> URLs from web pages.</div>
+          {% else %}—{% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if job.description %}
+      <div class="detail-section">
+        <h5>Description</h5>
+        <div style="white-space: pre-wrap;">{{ job.description }}</div>
+      </div>
+    {% endif %}
+
+    {% if job.notes %}
+      <div class="detail-section">
+        <h5>Notes</h5>
+        <div style="white-space: pre-wrap;">{{ job.notes }}</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-5">
+    <div class="detail-section">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">Interviews ({{ job.interviews|length }})</h5>
+        <a href="{{ url_for('interviews.new', job_id=job.id) }}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg"></i> Add</a>
+      </div>
+      {% if job.interviews %}
+        <ul class="list-unstyled mb-0">
+          {% for iv in job.interviews %}
+            <li class="py-2 border-bottom">
+              <a href="{{ url_for('interviews.detail', interview_id=iv.id) }}" class="fw-semibold">{{ iv.round_name or 'Interview' }}</a>
+              <div class="small text-muted">
+                {{ iv.scheduled_at|fmt_datetime }} · {{ iv.format }} · {{ iv.status }}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted mb-0">No interviews yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="detail-section">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">Conversations ({{ job.conversations|length }})</h5>
+        <a href="{{ url_for('conversations.new', job_id=job.id) }}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg"></i> Add</a>
+      </div>
+      {% if job.conversations %}
+        <ul class="list-unstyled mb-0">
+          {% for c in job.conversations %}
+            <li class="py-2 border-bottom">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <span class="badge bg-light text-dark me-1">{{ c.channel }}</span>
+                  <strong>{{ c.subject or '(no subject)' }}</strong>
+                  {% if c.contact %}<span class="small text-muted">· {{ c.contact.name }}</span>{% endif %}
+                </div>
+                <div class="small text-muted">{{ c.occurred_at|fmt_datetime }}</div>
+              </div>
+              {% if c.notes %}<div class="small mt-1" style="white-space: pre-wrap;">{{ c.notes }}</div>{% endif %}
+              {% if c.follow_up_date %}
+                <div class="small text-warning mt-1"><i class="bi bi-clock"></i> Follow up: {{ c.follow_up_date|fmt_date }}</div>
+              {% endif %}
+              <div class="mt-1">
+                <a href="{{ url_for('conversations.edit', conversation_id=c.id) }}" class="small">Edit</a>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted mb-0">No conversations logged.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

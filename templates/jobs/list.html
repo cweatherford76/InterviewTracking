@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, rating_stars, tag_pills %}
+{% block title %}Jobs · Interview Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Jobs</h3>
+  <div>
+    <a href="{{ url_for('jobs.pipeline') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-kanban"></i> Pipeline
+    </a>
+    <a href="{{ url_for('jobs.new') }}" class="btn btn-primary btn-sm">
+      <i class="bi bi-plus-lg"></i> New Job
+    </a>
+  </div>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-3">
+    <input type="text" name="q" class="form-control form-control-sm" placeholder="Search title or description"
+           value="{{ current_search }}">
+  </div>
+  <div class="col-md-2">
+    <select name="status" class="form-select form-select-sm">
+      <option value="">All statuses</option>
+      {% for value, label in statuses %}
+        <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="company_id" class="form-select form-select-sm">
+      <option value="">All companies</option>
+      {% for c in companies %}
+        <option value="{{ c.id }}" {% if current_company_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="tag_id" class="form-select form-select-sm">
+      <option value="">All tags</option>
+      {% for t in tags %}
+        <option value="{{ t.id }}" {% if current_tag_id == t.id %}selected{% endif %}>{{ t.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-secondary btn-sm w-100" type="submit">Filter</button>
+  </div>
+</form>
+
+<div class="card">
+  <table class="table list-table mb-0">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Company</th>
+        <th>Status</th>
+        <th>Rating</th>
+        <th>Tags</th>
+        <th>Applied</th>
+        <th>Updated</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for job in jobs %}
+        <tr>
+          <td>
+            <a href="{{ url_for('jobs.detail', job_id=job.id) }}" class="fw-semibold text-decoration-none">{{ job.title }}</a>
+            {% if job.location %}<div class="small text-muted">{{ job.location }}{% if job.remote_type %} · {{ job.remote_type }}{% endif %}</div>{% endif %}
+          </td>
+          <td><a href="{{ url_for('companies.detail', company_id=job.company.id) }}" class="text-decoration-none">{{ job.company.name }}</a></td>
+          <td>{{ status_badge(job.status) }}</td>
+          <td>{{ rating_stars(job.rating) }}</td>
+          <td>{{ tag_pills(job.tags) }}</td>
+          <td class="small">{{ job.application_date|fmt_date }}</td>
+          <td class="small text-muted">{{ job.updated_at|fmt_date }}</td>
+          <td class="text-end">
+            <a href="{{ url_for('jobs.edit', job_id=job.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No jobs match your filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

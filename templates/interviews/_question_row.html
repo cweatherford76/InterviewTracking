@@ -1,0 +1,21 @@
+<div class="q-row {% if q.was_difficult %}difficult{% endif %}" id="q-{{ q.id }}">
+  <div class="d-flex justify-content-between">
+    <div class="flex-grow-1">
+      <div class="question">
+        {% if q.was_difficult %}<i class="bi bi-exclamation-triangle-fill text-warning me-1" title="Difficult"></i>{% endif %}
+        {{ q.question }}
+      </div>
+      {% if q.my_answer %}<div class="small mt-1"><strong>My answer:</strong> {{ q.my_answer }}</div>{% endif %}
+      {% if q.notes %}<div class="small text-muted mt-1">{{ q.notes }}</div>{% endif %}
+    </div>
+    <div>
+      <button class="btn btn-sm btn-outline-danger"
+              hx-post="{{ url_for('interviews.delete_question', question_id=q.id) }}"
+              hx-target="#q-{{ q.id }}"
+              hx-swap="outerHTML"
+              hx-confirm="Delete this question?">
+        <i class="bi bi-trash"></i>
+      </button>
+    </div>
+  </div>
+</div>

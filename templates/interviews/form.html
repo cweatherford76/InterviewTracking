@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{% if interview %}Edit{% else %}New{% endif %} Interview · Interview Tracker{% endblock %}
+
+{% block content %}
+<h3>{% if interview %}Edit{% else %}New{% endif %} Interview <small class="text-muted">— {{ job.title }} @ {{ job.company.name }}</small></h3>
+
+<form method="post" class="row g-3 mt-2">
+  <div class="col-md-4">
+    <label class="form-label">Round name</label>
+    <input type="text" name="round_name" class="form-control" placeholder="e.g. Phone Screen, Onsite Loop"
+           value="{{ interview.round_name or '' if interview else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Scheduled at *</label>
+    <input type="datetime-local" name="scheduled_at" required class="form-control"
+           value="{{ interview.scheduled_at.strftime('%Y-%m-%dT%H:%M') if interview else '' }}">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Duration (min)</label>
+    <input type="number" name="duration_minutes" class="form-control" min="5" step="5"
+           value="{{ interview.duration_minutes if interview else 60 }}">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Format</label>
+    <select name="format" class="form-select">
+      {% for v, label in formats %}
+        <option value="{{ v }}" {% if interview and interview.format == v %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-8">
+    <label class="form-label">Location or video link</label>
+    <input type="text" name="location_or_link" class="form-control"
+           value="{{ interview.location_or_link or '' if interview else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Status</label>
+    <select name="status" class="form-select">
+      {% for v, label in statuses %}
+        <option value="{{ v }}" {% if interview and interview.status == v %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Preparation notes</label>
+    <textarea name="preparation_notes" class="form-control" rows="4">{{ interview.preparation_notes or '' if interview else '' }}</textarea>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Outcome notes</label>
+    <textarea name="outcome_notes" class="form-control" rows="4">{{ interview.outcome_notes or '' if interview else '' }}</textarea>
+  </div>
+
+  <div class="col-md-3">
+    <label class="form-label">Overall impression</label>
+    <select name="overall_impression" class="form-select">
+      <option value="">—</option>
+      {% for n in [1,2,3,4,5] %}
+        <option value="{{ n }}" {% if interview and interview.overall_impression == n %}selected{% endif %}>{{ n }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-12 d-flex justify-content-between">
+    <button class="btn btn-primary">{% if interview %}Save{% else %}Create Interview{% endif %}</button>
+    <a href="{{ url_for('jobs.detail', job_id=job.id) }}" class="btn btn-link">Cancel</a>
+  </div>
+</form>
+{% endblock %}

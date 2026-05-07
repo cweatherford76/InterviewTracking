@@ -1,0 +1,21 @@
+{% macro status_badge(status) %}
+  <span class="status-badge status-{{ status }}">{{ status|capitalize }}</span>
+{% endmacro %}
+
+{% macro rating_stars(rating) %}
+  {% if rating %}
+    <span class="rating-stars">
+      {% for i in range(1, 6) %}
+        {% if i <= rating %}&#9733;{% else %}<span class="empty">&#9733;</span>{% endif %}
+      {% endfor %}
+    </span>
+  {% else %}
+    <span class="text-muted small">—</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro tag_pills(tags) %}
+  {% for tag in tags %}
+    <span class="tag-pill" style="background: {{ tag.color }};">{{ tag.name }}</span>
+  {% endfor %}
+{% endmacro %}

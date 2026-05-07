@@ -1,0 +1,48 @@
+body { background: #f7f8fa; }
+
+.card { border: 1px solid #e3e6ea; }
+.card-header { background: #f1f3f5; font-weight: 600; }
+
+.tag-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #fff;
+  margin-right: 4px;
+}
+
+.rating-stars { color: #f59e0b; letter-spacing: 1px; }
+.rating-stars .empty { color: #d4d4d4; }
+
+.status-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+.status-interested   { background: #e0f2fe; color: #0369a1; }
+.status-applied      { background: #ede9fe; color: #5b21b6; }
+.status-interviewing { background: #fef3c7; color: #92400e; }
+.status-offer        { background: #dcfce7; color: #166534; }
+.status-rejected     { background: #fee2e2; color: #991b1b; }
+.status-withdrawn    { background: #e5e7eb; color: #374151; }
+
+.pipeline-board { display: grid; grid-template-columns: repeat(6, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; }
+.pipeline-col { background: #fff; border: 1px solid #e3e6ea; border-radius: 8px; padding: 10px; min-height: 240px; }
+.pipeline-col h6 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.pipeline-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; cursor: pointer; }
+.pipeline-card:hover { background: #eef2f7; }
+.pipeline-card .title { font-weight: 600; font-size: 14px; }
+.pipeline-card .company { font-size: 12px; color: #64748b; }
+
+.list-table th { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: #6b7280; }
+
+.detail-section { background: #fff; border: 1px solid #e3e6ea; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.detail-section h5 { font-size: 14px; text-transform: uppercase; color: #475569; letter-spacing: .5px; margin-bottom: 12px; }
+
+.fc-event { cursor: pointer; }
+
+.q-row { padding: 8px 12px; border-bottom: 1px solid #eef0f2; }
+.q-row:last-child { border-bottom: 0; }
+.q-row .question { font-weight: 600; }
+.q-row.difficult { background: #fffbeb; }

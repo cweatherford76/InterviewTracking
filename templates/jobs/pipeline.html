@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rating_stars %}
+{% block title %}Pipeline · Interview Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Pipeline</h3>
+  <a href="{{ url_for('jobs.list_view') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-list-ul"></i> List view
+  </a>
+</div>
+
+<div class="pipeline-board">
+  {% for value, label, jobs in columns %}
+    <div class="pipeline-col" data-status="{{ value }}">
+      <h6>
+        <span class="status-badge status-{{ value }}">{{ label }}</span>
+        <span class="text-muted small">{{ jobs|length }}</span>
+      </h6>
+      {% for job in jobs %}
+        <div class="pipeline-card" draggable="true" data-job-id="{{ job.id }}"
+             onclick="window.location='{{ url_for('jobs.detail', job_id=job.id) }}'">
+          <div class="title">{{ job.title }}</div>
+          <div class="company">{{ job.company.name }}</div>
+          <div class="mt-1 small">{{ rating_stars(job.rating) }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll('.pipeline-card').forEach(card => {
+    card.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', card.dataset.jobId);
+      card.style.opacity = '0.5';
+    });
+    card.addEventListener('dragend', () => { card.style.opacity = ''; });
+  });
+
+  document.querySelectorAll('.pipeline-col').forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); col.style.background = '#eef2f7'; });
+    col.addEventListener('dragleave', () => { col.style.background = ''; });
+    col.addEventListener('drop', async e => {
+      e.preventDefault();
+      col.style.background = '';
+      const jobId = e.dataTransfer.getData('text/plain');
+      const status = col.dataset.status;
+      const fd = new FormData();
+      fd.append('status', status);
+      const res = await fetch(`/jobs/${jobId}/status`, { method: 'POST', body: fd, headers: { 'HX-Request': 'true' } });
+      if (res.ok) window.location.reload();
+    });
+  });
+</script>
+{% endblock %}

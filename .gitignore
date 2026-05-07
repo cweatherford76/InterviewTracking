@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+instance/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Environment
+.env
+.env.local

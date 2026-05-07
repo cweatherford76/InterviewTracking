@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{% if conversation %}Edit{% else %}Log{% endif %} Conversation · {{ job.title }}{% endblock %}
+
+{% block content %}
+<h3>{% if conversation %}Edit{% else %}Log{% endif %} Conversation <small class="text-muted">— {{ job.title }}</small></h3>
+
+<form method="post" class="row g-3 mt-2">
+  <div class="col-md-4">
+    <label class="form-label">When</label>
+    <input type="datetime-local" name="occurred_at" class="form-control"
+           value="{{ conversation.occurred_at.strftime('%Y-%m-%dT%H:%M') if conversation else '' }}">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Channel</label>
+    <select name="channel" class="form-select">
+      {% for v, label in channels %}
+        <option value="{{ v }}" {% if conversation and conversation.channel == v %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Contact</label>
+    <select name="contact_id" class="form-select">
+      <option value="">—</option>
+      {% for c in contacts %}
+        <option value="{{ c.id }}" {% if conversation and conversation.contact_id == c.id %}selected{% endif %}>{{ c.name }}{% if c.company %} ({{ c.company.name }}){% endif %}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-8">
+    <label class="form-label">Subject</label>
+    <input type="text" name="subject" class="form-control" value="{{ conversation.subject or '' if conversation else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Follow-up date</label>
+    <input type="date" name="follow_up_date" class="form-control"
+           value="{{ conversation.follow_up_date|fmt_date if conversation and conversation.follow_up_date else '' }}">
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">Notes</label>
+    <textarea name="notes" class="form-control" rows="6">{{ conversation.notes or '' if conversation else '' }}</textarea>
+  </div>
+
+  <div class="col-12 d-flex justify-content-between">
+    <button class="btn btn-primary">{% if conversation %}Save{% else %}Log Conversation{% endif %}</button>
+    <div>
+      {% if conversation %}
+        <form method="post" action="{{ url_for('conversations.delete', conversation_id=conversation.id) }}" class="d-inline"
+              onsubmit="return confirm('Delete this conversation?');">
+          <button class="btn btn-link text-danger">Delete</button>
+        </form>
+      {% endif %}
+      <a href="{{ url_for('jobs.detail', job_id=job.id) }}" class="btn btn-link">Cancel</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

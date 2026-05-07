@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{% if company %}Edit{% else %}New{% endif %} Company · Interview Tracker{% endblock %}
+
+{% block content %}
+<h3>{% if company %}Edit Company{% else %}New Company{% endif %}</h3>
+
+<form method="post" class="row g-3 mt-2">
+  <div class="col-md-6">
+    <label class="form-label">Name *</label>
+    <input type="text" name="name" required class="form-control" value="{{ company.name if company else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Website</label>
+    <input type="url" name="website" class="form-control" value="{{ company.website or '' if company else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Industry</label>
+    <input type="text" name="industry" class="form-control" value="{{ company.industry or '' if company else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Size</label>
+    <input type="text" name="size" class="form-control" placeholder="e.g. 51-200" value="{{ company.size or '' if company else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Headquarters</label>
+    <input type="text" name="headquarters" class="form-control" value="{{ company.headquarters or '' if company else '' }}">
+  </div>
+  <div class="col-12">
+    <label class="form-label">Notes</label>
+    <textarea name="notes" class="form-control" rows="4">{{ company.notes or '' if company else '' }}</textarea>
+  </div>
+  <div class="col-12 d-flex justify-content-between">
+    <button type="submit" class="btn btn-primary">{% if company %}Save{% else %}Create{% endif %}</button>
+    <a href="{{ url_for('companies.list_view') }}" class="btn btn-link">Cancel</a>
+  </div>
+</form>
+{% endblock %}

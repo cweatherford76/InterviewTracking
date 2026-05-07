@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{% if contact %}Edit{% else %}New{% endif %} Contact · Interview Tracker{% endblock %}
+
+{% block content %}
+<h3>{% if contact %}Edit Contact{% else %}New Contact{% endif %}</h3>
+
+<form method="post" class="row g-3 mt-2">
+  <div class="col-md-6">
+    <label class="form-label">Name *</label>
+    <input type="text" name="name" required class="form-control" value="{{ contact.name if contact else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Title</label>
+    <input type="text" name="title" class="form-control" value="{{ contact.title or '' if contact else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Company</label>
+    <select name="company_id" class="form-select">
+      <option value="">—</option>
+      {% for c in companies %}
+        <option value="{{ c.id }}" {% if contact and contact.company_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">LinkedIn</label>
+    <input type="url" name="linkedin_url" class="form-control" value="{{ contact.linkedin_url or '' if contact else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Email</label>
+    <input type="email" name="email" class="form-control" value="{{ contact.email or '' if contact else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Phone</label>
+    <input type="text" name="phone" class="form-control" value="{{ contact.phone or '' if contact else '' }}">
+  </div>
+  <div class="col-12">
+    <label class="form-label">Notes</label>
+    <textarea name="notes" class="form-control" rows="3">{{ contact.notes or '' if contact else '' }}</textarea>
+  </div>
+  <div class="col-12 d-flex justify-content-between">
+    <button type="submit" class="btn btn-primary">{% if contact %}Save{% else %}Create{% endif %}</button>
+    <a href="{{ url_for('contacts.list_view') }}" class="btn btn-link">Cancel</a>
+  </div>
+</form>
+{% endblock %}

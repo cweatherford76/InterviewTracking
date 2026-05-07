@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Calendar · Interview Tracker{% endblock %}
+
+{% block head_extra %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Calendar</h3>
+  <div class="small">
+    <span class="badge" style="background:#0d6efd;">Interviews</span>
+    <span class="badge text-dark" style="background:#ffc107;">Follow-ups</span>
+    <span class="badge" style="background:#dc3545;">Deadlines</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div id="calendar"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const el = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(el, {
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay',
+      },
+      navLinks: true,
+      nowIndicator: true,
+      editable: true,
+      eventDurationEditable: false,
+      events: '/api/calendar/events',
+      eventClick: function(info) {
+        if (info.event.url) {
+          info.jsEvent.preventDefault();
+          window.location.href = info.event.url;
+        }
+      },
+      eventDrop: async function(info) {
+        const ext = info.event.extendedProps;
+        if (ext.type !== 'interview') {
+          info.revert();
+          return;
+        }
+        const fd = new FormData();
+        fd.append('scheduled_at', info.event.start.toISOString());
+        const res = await fetch(`/api/interviews/${ext.interview_id}/reschedule`, {
+          method: 'POST',
+          body: fd,
+        });
+        if (!res.ok) {
+          alert('Could not reschedule');
+          info.revert();
+        }
+      },
+    });
+    calendar.render();
+  });
+</script>
+{% endblock %}
