@@ -27,15 +27,36 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const el = document.getElementById('calendar');
+    let lastGridView = 'dayGridMonth';
+
     const calendar = new FullCalendar.Calendar(el, {
       initialView: 'dayGridMonth',
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay viewToggle',
       },
-      buttonText: {
-        listMonth: 'List',
+      customButtons: {
+        viewToggle: {
+          text: 'List',
+          click: function () {
+            if (calendar.view.type === 'listMonth') {
+              calendar.changeView(lastGridView);
+            } else {
+              lastGridView = calendar.view.type;
+              calendar.changeView('listMonth');
+            }
+          },
+        },
+      },
+      datesSet: function (info) {
+        const btn = document.querySelector('.fc-viewToggle-button');
+        if (btn) {
+          btn.textContent = info.view.type === 'listMonth' ? 'Calendar' : 'List';
+        }
+        if (info.view.type !== 'listMonth') {
+          lastGridView = info.view.type;
+        }
       },
       navLinks: true,
       nowIndicator: true,
