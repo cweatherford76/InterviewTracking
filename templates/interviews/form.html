@@ -52,12 +52,12 @@
     <textarea name="outcome_notes" class="form-control" rows="4">{{ interview.outcome_notes or '' if interview else '' }}</textarea>
   </div>
 
-  <div class="col-md-3">
+  <div class="col-md-4">
     <label class="form-label">Overall impression</label>
     <select name="overall_impression" class="form-select">
       <option value="">—</option>
-      {% for n in [1,2,3,4,5] %}
-        <option value="{{ n }}" {% if interview and interview.overall_impression == n %}selected{% endif %}>{{ n }}</option>
+      {% for n, label in [(1, 'Not interested'), (2, 'Slightly interested'), (3, 'Somewhat interested'), (4, 'Interested'), (5, 'Very interested')] %}
+        <option value="{{ n }}" {% if interview and interview.overall_impression == n %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
   </div>
